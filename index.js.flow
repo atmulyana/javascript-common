@@ -1,0 +1,12 @@
+/**
+ * https://github.com/atmulyana/javascript-common
+ * 
+ * @flow
+ */
+declare export function noop(): empty;
+declare export function noChange<P>(p: P): P;
+declare export var emptyString: string;
+
+declare export function extendObject<T: Object, P: Object>(target: T, proxy: P): {...T, ...P};
+declare export function proxyObject<T: Object, P: Object>(target: T, proxy: P | (T => P)): {...T, ...P};
+declare export function proxyClass<T: Object, P: Object>(Target: Class<T>, proxy: P | (T => P)): {...T, ...P};

@@ -1,0 +1,21 @@
+{
+  "name": "javascript-common",
+  "version": "0.0.1",
+  "description": "Things common in javascript code",
+  "license": "MIT",
+  "repository": "https://github.com/atmulyana/javascript-common",
+  "keywords": [
+    "javascript",
+    "common"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "flow": "flow"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "devDependencies": {
+    "flow-bin": "latest"
+  }
+}
