@@ -3,16 +3,24 @@
  */
 'use strict';
 
-export const noop = () => {};
-export const noChange = p => p;
-export const emptyString = '';
+const noop = () => {};
+const noChange = p => p;
+const emptyString = '';
 
-export const extendObject = (target, proxy) => (Object.setPrototypeOf(proxy, target), proxy);
+const extendObject = (target, proxy) => (
+    target = target === null || target === undefined ? {} : target,
+    proxy = proxy === null || proxy === undefined ? {} : proxy,
+    Object.setPrototypeOf(proxy, target),
+    proxy
+);
 
-export function proxyObject(target, proxy) {
+function proxyObject(target, proxy) {
+    target = target === null || target === undefined ? {} : target;
     return new Proxy(target, {
         get: function(target, prop, receiver) {
-            const proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
+            proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
+            proxy = proxy === null || proxy === undefined ? {} : proxy;
+            if (prop == '__proto__') return target;
             if (proxy && proxy[prop] !== undefined) {
                 let value = proxy[prop];
                 if (typeof(value) == 'function') value = value.bind(proxy);
@@ -23,7 +31,7 @@ export function proxyObject(target, proxy) {
     });
 }
 
-export function proxyClass(Target, proxy) {
+function proxyClass(Target, proxy) {
     return new Proxy(Target, {
         construct(Target, args) {
             const target = new Target(...args);
@@ -31,3 +39,12 @@ export function proxyClass(Target, proxy) {
         }
     });
 }
+
+if (typeof(module) == 'object' && module) module.exports = {
+    noop,
+    noChange,
+    emptyString,
+    extendObject,
+    proxyObject,
+    proxyClass,
+};
