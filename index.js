@@ -18,12 +18,12 @@ function proxyObject(target, proxy) {
     target = target === null || target === undefined ? {} : target;
     return new Proxy(target, {
         get: function(target, prop, receiver) {
-            proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
-            proxy = proxy === null || proxy === undefined ? {} : proxy;
             if (prop == '__proto__') return target;
-            if (proxy && proxy[prop] !== undefined) {
-                let value = proxy[prop];
-                if (typeof(value) == 'function') value = value.bind(proxy);
+            let $proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
+            $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
+            if ($proxy[prop] !== undefined) {
+                let value = $proxy[prop];
+                if (typeof(value) == 'function') value = value.bind($proxy);
                 return value;
             }
             return Reflect.get(target, prop, receiver);
