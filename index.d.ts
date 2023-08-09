@@ -42,11 +42,13 @@ export function extendObject<T extends object, P extends object>(target: T, prox
  * useful if `target` already has a prototype object.
  * @param target The extended object
  * @param proxy The object which has the extending members
+ * @param proxiedIfNotExist If `true` then it's only proxied if the member doesn't exist on `target`. By default, it's `false`.
  * @returns A `Proxy` object
  */
 export function proxyObject<T extends object, P extends object>(
     target: T,
-    proxy: P | ((target: T) => P)
+    proxy: P | ((target: T) => P),
+    proxiedIfNotExist?: boolean
 ): T & P;
 
 /**
@@ -54,9 +56,11 @@ export function proxyObject<T extends object, P extends object>(
  * This function will create the target instance: `const target = new Target()`
  * @param Target The class of the extended object
  * @param proxy The object which has the extending members
+ * @param proxiedIfNotExist Needed by `proxyObject`
  * @returns A `Proxy` object
  */
 export function proxyClass<T extends object, P extends object>(
     Target: typeof T,
-    proxy: P | ((target: T) => P)
+    proxy: P | ((target: T) => P),
+    proxiedIfNotExist?: boolean
 ): T & P;

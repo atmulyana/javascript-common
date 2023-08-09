@@ -14,14 +14,14 @@ const extendObject = (target, proxy) => (
     proxy
 );
 
-function proxyObject(target, proxy) {
+function proxyObject(target, proxy, proxiedIfNotExist = false) {
     target = target === null || target === undefined ? {} : target;
     return new Proxy(target, {
         get: function(target, prop, receiver) {
             if (prop == '__proto__') return target;
             let $proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
             $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
-            if ($proxy[prop] !== undefined) {
+            if ($proxy[prop] !== undefined && (!proxiedIfNotExist || target[prop] === undefined)) {
                 let value = $proxy[prop];
                 if (typeof(value) == 'function') value = value.bind($proxy);
                 return value;
@@ -31,11 +31,11 @@ function proxyObject(target, proxy) {
     });
 }
 
-function proxyClass(Target, proxy) {
+function proxyClass(Target, proxy, proxiedIfNotExist = false) {
     return new Proxy(Target, {
         construct(Target, args) {
             const target = new Target(...args);
-            return proxyObject(target, proxy);
+            return proxyObject(target, proxy, proxiedIfNotExist);
         }
     });
 }
