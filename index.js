@@ -17,16 +17,14 @@ const extendObject = (target, proxy) => (
 function proxyObject(target, proxy, proxiedIfNotExist = false) {
     target = target === null || target === undefined ? {} : target;
     return new Proxy(target, {
-        get: function(target, prop, receiver) {
+        get: function(target, prop) {
             if (prop == '__proto__') return target;
             let $proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
             $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
-            if ($proxy[prop] !== undefined && (!proxiedIfNotExist || target[prop] === undefined)) {
-                let value = $proxy[prop];
-                if (typeof(value) == 'function') value = value.bind($proxy);
-                return value;
+            if ( (prop in $proxy) && (!proxiedIfNotExist || !(prop in target)) ) {
+                return Reflect.get($proxy, prop, $proxy);
             }
-            return Reflect.get(target, prop, receiver);
+            return Reflect.get(target, prop, target);
         }
     });
 }
