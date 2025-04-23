@@ -23,6 +23,10 @@ export function noChange<P>(p: P): P;
  */
 export var emptyString: string;
 
+type CombineObject<T extends object | null | undefined, P extends object | null | undefined> =
+    T extends NonNullable<T> ? (P extends NonNullable<P> ? T & P : T)
+                             : (P extends NonNullable<P> ? P : {});
+
 /**
  * It extends the object `target` by adding to it the new members (properties/methods) from the object `proxy`.
  * It's like `Object.assign(target, proxy)`, but different from `Object.assign`, when there are some the same
@@ -35,7 +39,10 @@ export var emptyString: string;
  * @param proxy The object which has the extending members
  * @returns Different from `Object.assign`, it returns the reference of `proxy`, not `target`
  */
-export function extendObject<T extends object, P extends object>(target: T, proxy: P): T & P;
+export function extendObject<T extends object | null | undefined, P extends object | null | undefined>(
+    target: T,
+    proxy: P
+): CombineObject<T, P>;
 
 /**
  * Similar to `extendObject` but it doesn't change the prototype of `target`. It utilizes a `Proxy` object. It's
@@ -45,11 +52,11 @@ export function extendObject<T extends object, P extends object>(target: T, prox
  * @param proxiedIfNotExist If `true` then it's only proxied if the member doesn't exist on `target`. By default, it's `false`.
  * @returns A `Proxy` object
  */
-export function proxyObject<T extends object, P extends object>(
+export function proxyObject<T extends object | null | undefined, P extends object | null | undefined>(
     target: T,
     proxy: P | ((target: T) => P),
     proxiedIfNotExist?: boolean
-): T & P;
+): CombineObject<T, P>;
 
 /**
  * Similar to `proxyObject` but the first parameter is not an instance object, it's a class of target object.
@@ -59,8 +66,8 @@ export function proxyObject<T extends object, P extends object>(
  * @param proxiedIfNotExist Needed by `proxyObject`
  * @returns A `Proxy` object
  */
-export function proxyClass<T extends object, P extends object>(
-    Target: typeof T,
-    proxy: P | ((target: T) => P),
+export function proxyClass<Class extends (abstract new (...args: any) => any), P extends object | null | undefined>(
+    Target: Class,
+    proxy: P | ((target: InstanceType<Class>) => P),
     proxiedIfNotExist?: boolean
-): T & P;
+): CombineObject<InstanceType<Class>, P>;
