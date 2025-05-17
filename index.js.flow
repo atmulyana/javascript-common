@@ -7,12 +7,12 @@ declare export function noop(): empty;
 declare export function noChange<P>(p: P): P;
 declare export var emptyString: string;
 
-declare export const extendObject:
-    & (<T: ?{...}, P: ?{...}>(target: T, proxy: P) => {...$Exact<T>, ...$Exact<P>})
-    & (<T, P>(target: T, proxy: P) => T & P);
+declare export var extendObject:
+    & (<T: ?{...}, P: ?{...}>(target: T, extObj: P) => {...$Exact<T>, ...$Exact<P>})
+    & (<T, P>(target: T, extObj: P) => T & P);
 
-declare export const proxyObject:
-    (<T: ?{...}, P: ?{...}>(target: T, proxy: P | (T => P), proxiedIfNotExist?: boolean) => {...$Exact<T>, ...$Exact<P>})
-    & (<T, P>(target: T, proxy: P | (T => P), proxiedIfNotExist?: boolean) => T & P);
+declare export var proxyObject:
+    (<T: ?{...}, P: ?{...}>(target: T, extObj: P | (T => P), proxiedIfNotExist?: boolean) => {...$Exact<T>, ...$Exact<P>})
+    & (<T, P>(target: T, extObj: P | (T => P), proxiedIfNotExist?: boolean) => T & P);
 
-declare export function proxyClass<T, P>(Target: Class<T>, proxy: P | (T => P), proxiedIfNotExist?: boolean): T & P;
+declare export function proxyClass<T, P>(Target: Class<T>, extObj: P | (T => P), proxiedIfNotExist?: boolean): T & P;

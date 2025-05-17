@@ -7,33 +7,63 @@ const noop = () => {};
 const noChange = p => p;
 const emptyString = '';
 
-const extendObject = (target, proxy) => (
+const extendObject = (target, extObj) => (
     target = target === null || target === undefined ? {} : target,
-    proxy = proxy === null || proxy === undefined ? {} : proxy,
-    Object.setPrototypeOf(proxy, target),
-    proxy
+    extObj = extObj === null || extObj === undefined ? {} : extObj,
+    Object.setPrototypeOf(extObj, target),
+    extObj
 );
 
-function proxyObject(target, proxy, proxiedIfNotExist = false) {
+const getSymbol = Symbol('proxyObject-get');
+function proxyObject(target, extObj, proxiedIfNotExist = false) {
     target = target === null || target === undefined ? {} : target;
-    return new Proxy(target, {
-        get: function(target, prop) {
-            if (prop == '__proto__') return target;
-            let $proxy = typeof(proxy) == 'function' ? proxy(target) : proxy;
-            $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
-            if ( (prop in $proxy) && (!proxiedIfNotExist || !(prop in target)) ) {
-                return Reflect.get($proxy, prop, $proxy);
+
+    function getValue(obj, prop) {
+        const val = obj[prop];
+        if (typeof(val) == 'function') {
+            return (...args) => {
+                return val.apply(obj, args);
             }
-            return Reflect.get(target, prop, target);
         }
-    });
+        else {
+            return val;
+        }
+    }
+
+    function get(_target, prop) {
+        if (prop == '__proto__') return target;
+        let $proxy = typeof(extObj) == 'function' ? extObj(target) : extObj;
+        $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
+        if ( (prop in $proxy) && (!proxiedIfNotExist || !(prop in target)) ) {
+            return getValue($proxy, prop);
+        }
+        else if (prop === getSymbol) {
+            return _target[getSymbol];
+        }
+        else if (getSymbol in target) {
+            return target[getSymbol](target, prop);
+        }
+        return getValue(target, prop);
+    }
+
+    return new Proxy(
+        {
+            [getSymbol]: get,
+        },
+        {
+            get,
+            getPrototypeOf(_target) {
+                return target;
+            }
+        }
+    );
 }
 
-function proxyClass(Target, proxy, proxiedIfNotExist = false) {
+function proxyClass(Target, extObj, proxiedIfNotExist = false) {
     return new Proxy(Target, {
         construct(Target, args) {
             const target = new Target(...args);
-            return proxyObject(target, proxy, proxiedIfNotExist);
+            return proxyObject(target, extObj, proxiedIfNotExist);
         }
     });
 }

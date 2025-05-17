@@ -23,51 +23,60 @@ export function noChange<P>(p: P): P;
  */
 export var emptyString: string;
 
+type Extend<T, P> = Omit<T, keyof P> & P;
 type CombineObject<T extends object | null | undefined, P extends object | null | undefined> =
-    T extends NonNullable<T> ? (P extends NonNullable<P> ? T & P : T)
+    T extends NonNullable<T> ? (P extends NonNullable<P> ? Extend<T, P> : T)
                              : (P extends NonNullable<P> ? P : {});
 
 /**
- * It extends the object `target` by adding to it the new members (properties/methods) from the object `proxy`.
- * It's like `Object.assign(target, proxy)`, but different from `Object.assign`, when there are some the same
- * members among `target` and `proxy`, it doesn't remove those members from `target` and replace them with
- * the same ones from `proxy`. The original members still exist in `target`. This function is simply invoke
- * `Object.setPrototypeOf(proxy, target)`. If it's so simple, why do we need the wrapper function? It's because
+ * It extends the object `target` by adding to it the new members (properties/methods) from the object `extObj`.
+ * It's like `Object.assign(target, extObj)`, but different from `Object.assign`, when there are some the same
+ * members among `target` and `extObj`, it doesn't remove those members from `target` and replace them with
+ * the same ones from `extObj`. The original members still exist in `target`. This function is simply invoke
+ * `Object.setPrototypeOf(extObj, target)`. If it's so simple, why do we need the wrapper function? It's because
  * we need a static type checking. The type of the returned value should be the type which is combination between
- * `target`'s type and `proxy`'s type.
+ * `target`'s type and `extObj`'s type.
  * @param target The extended object
- * @param proxy The object which has the extending members
- * @returns Different from `Object.assign`, it returns the reference of `proxy`, not `target`
+ * @param extObj The object which has the extending members
+ * @returns Different from `Object.assign`, it returns the reference of `extObj`, not `target`
  */
 export function extendObject<T extends object | null | undefined, P extends object | null | undefined>(
     target: T,
-    proxy: P
+    extObj: P
 ): CombineObject<T, P>;
 
 /**
  * Similar to `extendObject` but it doesn't change the prototype of `target`. It utilizes a `Proxy` object. It's
  * useful if `target` already has a prototype object.
  * @param target The extended object
- * @param proxy The object which has the extending members
- * @param proxiedIfNotExist If `true` then it's only proxied if the member doesn't exist on `target`. By default, it's `false`.
+ * @param extObj The object which has the extending members. It may be also a function with format `target => extObj`.
+ * @param proxiedIfNotExist If `true` then a member is read from `extObj` only if the member doesn't exist on `target`. By default, it's `false`.
  * @returns A `Proxy` object
  */
-export function proxyObject<T extends object | null | undefined, P extends object | null | undefined>(
+export function proxyObject<
+    T extends object | null | undefined,
+    P extends object | null | undefined,
+    NE extends (boolean | undefined) = false
+>(
     target: T,
-    proxy: P | ((target: T) => P),
-    proxiedIfNotExist?: boolean
-): CombineObject<T, P>;
+    extObj: P | ((target: T) => P),
+    proxiedIfNotExist?: NE
+): NE extends true ? CombineObject<P, T> : CombineObject<T, P>;
 
 /**
  * Similar to `proxyObject` but the first parameter is not an instance object, it's a class of target object.
- * This function will create the target instance: `const target = new Target()`
+ * This function will create the target instance: `const target = new Target(...args)` and then call `proxyObject`  
  * @param Target The class of the extended object
- * @param proxy The object which has the extending members
+ * @param extObj The object which has the extending members. It may be also a function with format `target => extObj`.
  * @param proxiedIfNotExist Needed by `proxyObject`
- * @returns A `Proxy` object
+ * @returns A `Proxy` object of the class.
  */
-export function proxyClass<Class extends (abstract new (...args: any) => any), P extends object | null | undefined>(
+export function proxyClass<
+    Class extends (abstract new (...args: any) => any),
+    P extends object | null | undefined,
+    NE extends (boolean | undefined) = false
+>(
     Target: Class,
-    proxy: P | ((target: InstanceType<Class>) => P),
-    proxiedIfNotExist?: boolean
-): CombineObject<InstanceType<Class>, P>;
+    extObj: P | ((target: InstanceType<Class>) => P),
+    proxiedIfNotExist?: NE
+): NE extends true ? CombineObject<P, InstanceType<Class>> : CombineObject<InstanceType<Class>, P>;
