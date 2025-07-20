@@ -14,7 +14,7 @@ const extendObject = (target, extObj) => (
     extObj
 );
 
-const getSymbol = Symbol('proxyObject-get');
+const getTargetSymbol = Symbol('proxyObject-getTarget');
 function proxyObject(target, extObj, proxiedIfNotExist = false) {
     target = target === null || target === undefined ? {} : target;
 
@@ -30,28 +30,43 @@ function proxyObject(target, extObj, proxiedIfNotExist = false) {
         }
     }
 
-    function get(_target, prop) {
-        if (prop == '__proto__') return target;
+     function getTarget(
+        _target, //It's the actual proxied object `{[getTargetSymbol]: getTarget}`
+        prop
+    ) {
         let $proxy = typeof(extObj) == 'function' ? extObj(target) : extObj;
         $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
         if ( (prop in $proxy) && (!proxiedIfNotExist || !(prop in target)) ) {
-            return getValue($proxy, prop);
+            return $proxy;
         }
-        else if (prop === getSymbol) {
-            return _target[getSymbol];
+        else if (getTargetSymbol in target) { //`target` is also an object yielded by `proxyObject` function
+            return target[getTargetSymbol](target, prop);
         }
-        else if (getSymbol in target) {
-            return target[getSymbol](target, prop);
+        return target;
+    }
+
+    function get(_target/*It's the actual proxied object `{[getTargetSymbol]: getTarget}`*/, prop) {
+        if (prop == '__proto__') return target;
+        if (prop === getTargetSymbol) { //Because `target[getTargetSymbol]` is invoked
+            return _target[getTargetSymbol];
         }
-        return getValue(target, prop);
+        const $target = getTarget(_target, prop);
+        return getValue($target, prop);
+    }
+
+    function set(_target, prop, value) {
+        const $target = getTarget(_target, prop);
+        $target[prop] = value;
+        return true;
     }
 
     return new Proxy(
         {
-            [getSymbol]: get,
+            [getTargetSymbol]: getTarget,
         },
         {
             get,
+            set,
             getPrototypeOf(_target) {
                 return target;
             }
