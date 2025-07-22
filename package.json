@@ -1,6 +1,6 @@
 {
   "name": "javascript-common",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Things common in javascript code",
   "license": "MIT",
   "repository": "https://github.com/atmulyana/javascript-common",
@@ -16,12 +16,19 @@
     "index.d.ts"
   ],
   "scripts": {
-    "flow": "flow"
+    "flow": "flow",
+    "test": "jest"
   },
   "engines": {
     "node": ">=6.0.0"
   },
   "devDependencies": {
-    "flow-bin": "*"
+    "flow-bin": "*",
+    "jest": "^30.0.5"
+  },
+  "jest": {
+    "testMatch": [
+      "**/__tests__/**/?(*.)+(spec|test).[jt]s?(x)"
+    ]
   }
 }

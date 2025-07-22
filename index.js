@@ -17,7 +17,9 @@ const extendObject = (target, extObj) => (
 const getTargetSymbol = Symbol('proxyObject-getTarget');
 function proxyObject(target, extObj, proxiedIfNotExist = false) {
     target = target === null || target === undefined ? {} : target;
-
+    let $proxy = typeof(extObj) == 'function' ? extObj(target) : extObj;
+    $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
+    
     function getValue(obj, prop) {
         const val = obj[prop];
         if (typeof(val) == 'function') {
@@ -34,8 +36,6 @@ function proxyObject(target, extObj, proxiedIfNotExist = false) {
         _target, //It's the actual proxied object `{[getTargetSymbol]: getTarget}`
         prop
     ) {
-        let $proxy = typeof(extObj) == 'function' ? extObj(target) : extObj;
-        $proxy = $proxy === null || $proxy === undefined ? {} : $proxy;
         if ( (prop in $proxy) && (!proxiedIfNotExist || !(prop in target)) ) {
             return $proxy;
         }
@@ -60,6 +60,11 @@ function proxyObject(target, extObj, proxiedIfNotExist = false) {
         return true;
     }
 
+    function has(_target, prop) {
+        if (prop === getTargetSymbol) return true;
+        return (prop in target) || (prop in $proxy);
+    }
+
     return new Proxy(
         {
             [getTargetSymbol]: getTarget,
@@ -67,6 +72,7 @@ function proxyObject(target, extObj, proxiedIfNotExist = false) {
         {
             get,
             set,
+            has,
             getPrototypeOf(_target) {
                 return target;
             }
