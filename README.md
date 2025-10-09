@@ -12,6 +12,22 @@ This function returns the parameter that is passed into it, no change (`p => p`)
 is often used as the default value for a variable whose function type. Instead of maintaining many copies,
 it's better to keep one copy in memory.
 
+#### `emptyArray`
+This is a read-only empty array (`[]`). Read-only means we cannot add/remove an entry to/from it. It's useful
+for a initial value of a "state" variable whose array type. In "React" framework, it can be used as the
+parameter of `React.useState` hook function. If there are many array "state" variable, it's better to keep one
+copy in memory. It's safe to share among some "state" variables because an array "state" variable is considered
+to change if it's assigned to a different instance of array. So, we may not just call `push` method and
+re-assign it.
+
+#### `emptyObject`
+This is a read-only empty plain object (`{}`). Read-only means we cannot set/unset a property to/from it. It's
+useful for a initial value of a "state" variable whose type of a plain object. In "React" framework, it can be
+used as the parameter of `React.useState` hook function. If there are many object "state" variable, it's better
+to keep one copy in memory. It's safe to share among some "state" variables because an object "state" variable
+is considered to change if it's assigned to a different instance of object. So, we may not just set/unset
+a property and re-assign it.
+
 #### `emptyString`
 This is an empty string (""). An empty string is often used as the default value of a string variable.
 

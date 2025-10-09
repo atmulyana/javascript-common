@@ -5,6 +5,8 @@
  */
 declare export function noop(): empty;
 declare export function noChange<P>(p: P): P;
+declare export var emptyArray: any[];
+declare export var emptyObject: {};
 declare export var emptyString: string;
 
 declare export var extendObject:

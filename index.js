@@ -5,6 +5,8 @@
 
 const noop = () => {};
 const noChange = p => p;
+const emptyArray = Object.freeze([]);
+const emptyObject = Object.freeze({});
 const emptyString = '';
 
 const extendObject = (target, extObj) => (
@@ -92,6 +94,8 @@ function proxyClass(Target, extObj, proxiedIfNotExist = false) {
 if (typeof(module) == 'object' && module) module.exports = {
     noop,
     noChange,
+    emptyArray,
+    emptyObject,
     emptyString,
     extendObject,
     proxyObject,
