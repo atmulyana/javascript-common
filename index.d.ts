@@ -43,6 +43,21 @@ export var emptyObject: {};
  */
 export var emptyString: string;
 
+/**
+ * To check a variable is a plain object that is an object that is created by using "object literal" (`{prop1: val1, prop2: val2, ...}`)
+ * @param o Any variable to check
+ */
+export function isPlainObject(o: any): boolean | null;
+
+/**
+ * To compare two plain objects recursively whether they are equal or not. It's not to check the object reference equality.
+ * Two plain objects are considered equal if they have exactly the same properties (the same property names and values).
+ * If a property value is a plain object then it will also be compared by the same way.
+ * @param o1 First object to compare
+ * @param o2 Second object to compare
+ */
+export function objEquals(o1: any, o2: any): boolean;
+
 type Extend<T, P> = Omit<T, keyof P> & P;
 type CombineObject<T extends object | null | undefined, P extends object | null | undefined> =
     T extends NonNullable<T> ? (P extends NonNullable<P> ? Extend<T, P> : T)

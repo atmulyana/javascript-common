@@ -9,6 +9,24 @@ const emptyArray = Object.freeze([]);
 const emptyObject = Object.freeze({});
 const emptyString = '';
 
+function isPlainObject(o) {
+    return typeof(o) == 'object' && o && Object.getPrototypeOf(o).constructor === Object;
+}
+
+function objEquals(o1, o2) {
+    if (isPlainObject(o1) && isPlainObject(o2)) {
+        if (Object.keys(o1).length != Object.keys(o2).length) return false;
+        for (var p in o1) {
+            if (isPlainObject(o1[p]) && isPlainObject(o2[p])) {
+                if (!objEquals(o1[p], o2[p])) return false;
+            }
+            else if (!Object.is(o1[p], o2[p])) return false;
+        }
+        return true;
+    }
+    return Object.is(o1, o2);
+}
+
 const extendObject = (target, extObj) => (
     target = target === null || target === undefined ? {} : target,
     extObj = extObj === null || extObj === undefined ? {} : extObj,
@@ -97,6 +115,8 @@ if (typeof(module) == 'object' && module) module.exports = {
     emptyArray,
     emptyObject,
     emptyString,
+    isPlainObject,
+    objEquals,
     extendObject,
     proxyObject,
     proxyClass,

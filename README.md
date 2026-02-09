@@ -3,15 +3,6 @@
 The code in this package is common to be used in some my projects. Although for my projects, it may be useful for you.
 Things that can be imported from this package:
 
-#### `noop`
-It's a function that does nothing (`() => {}`). This function is often used as the default value for
-a variable whose function type. Instead of maintaining many copies, it's better to keep one copy in memory.
-
-#### `noChange`
-This function returns the parameter that is passed into it, no change (`p => p`). Like `noop`, this function
-is often used as the default value for a variable whose function type. Instead of maintaining many copies,
-it's better to keep one copy in memory.
-
 #### `emptyArray`
 This is a read-only empty array (`[]`). Read-only means we cannot add/remove an entry to/from it. It's useful
 for a initial value of a "state" variable whose array type. In "React" framework, it can be used as the
@@ -42,6 +33,32 @@ we need a static type checking. The type of the returned value should be the typ
 
     <T extends object, P extends object>(target: T, extObj: P) => T & P
 
+
+#### `isPlainObject(obj)`
+To check a variable is a plain object that is an object that is created by using "object literal"
+(`{prop1: val1, prop2: val2, ...}`).  
+Parameters:
+- `obj`  
+  Any variable to check
+
+#### `noChange`
+This function returns the parameter that is passed into it, no change (`p => p`). Like `noop`, this function
+is often used as the default value for a variable whose function type. Instead of maintaining many copies,
+it's better to keep one copy in memory.
+
+#### `noop`
+It's a function that does nothing (`() => {}`). This function is often used as the default value for
+a variable whose function type. Instead of maintaining many copies, it's better to keep one copy in memory.
+
+#### `objEquals(obj1, obj2)`
+To compare two plain objects recursively whether they are equal or not. It's not to check the object reference equality.
+Two plain objects are considered equal if they have exactly the same properties (the same property names and values).
+If a property value is a plain object then it will also be compared by the same way.   
+Parameters:
+- `obj1`  
+  First object to compare
+- `obj2`  
+  Second object to compare
 
 #### `proxyObject(target, extObj, proxiedIfNotExist)`
 Similar to `extendObject` but it doesn't change the prototype of `target`. It utilizes a `Proxy` object. It's

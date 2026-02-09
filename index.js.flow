@@ -9,8 +9,11 @@ declare export var emptyArray: any[];
 declare export var emptyObject: {};
 declare export var emptyString: string;
 
+declare export function isPlainObject(o: any): boolean | null;
+declare export function objEquals(o1: any, o2: any): boolean;
+
 declare export var extendObject:
-    & (<T: ?{...}, P: ?{...}>(target: T, extObj: P) => {...$Exact<T>, ...$Exact<P>})
+    (<T: ?{...}, P: ?{...}>(target: T, extObj: P) => {...$Exact<T>, ...$Exact<P>})
     & (<T, P>(target: T, extObj: P) => T & P);
 
 declare export var proxyObject:
