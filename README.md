@@ -76,7 +76,7 @@ compared property values are array then `arrayEquals` function will be invoked t
   + `arrayLike` affects how `arrayEquals` function works. Please see the explanation of `arrayEquals` function.
 
 *Returns*:  
-It returns `true` if `o1` and `o2` are equal. Otherwise, it returns `false`.
+It returns `true` if `obj1` and `obj2` are equal. Otherwise, it returns `false`.
 
 #### `arrayEquals(ar1, ar2, opts?)`
 To compare two arrays (or array-like) recursively whether they are equal or not. It's not to check the array reference
