@@ -10,22 +10,54 @@ const emptyObject = Object.freeze({});
 const emptyString = '';
 
 function isPlainObject(o) {
-    return typeof(o) == 'object' && o && Object.getPrototypeOf(o).constructor === Object;
+    let proto;
+    return typeof(o) == 'object' && o
+        && (proto = Object.getPrototypeOf(o), proto.constructor) === Object
+        && Object.getPrototypeOf(proto) === null;
 }
 
-function objEquals(o1, o2) {
-    if (isPlainObject(o1) && isPlainObject(o2)) {
-        if (Object.keys(o1).length != Object.keys(o2).length) return false;
-        for (var p in o1) {
-            if (isPlainObject(o1[p]) && isPlainObject(o2[p])) {
-                if (!objEquals(o1[p], o2[p])) return false;
+function objEquals(o1, o2, opts = emptyObject) {
+    const {
+        equals = Object.is,
+        allProps = true,
+        arrayCheck = true,
+    } = opts;
+
+    return (arrayCheck ? arrayEquals(o1, o2, opts) : null) ?? (function() {
+        if (equals(o1, o2)) return true;
+        if (isPlainObject(o1) && isPlainObject(o2)) {
+            const getKeys = allProps ? Object.getOwnPropertyNames : Object.keys;
+            const keys = getKeys(o1);
+            if (keys.length != getKeys(o2).length) return false;
+            for (let p in o1) {
+                if ((p in o2) && objEquals(o1[p], o2[p], opts)) continue;
+                return false;
             }
-            else if (!Object.is(o1[p], o2[p])) return false;
+            return true;
+        }
+        return false;
+    })();
+}
+
+function arrayEquals(ar1, ar2, opts = emptyObject) {
+    const {
+        arrayLike,
+        equals = Object.is,
+    } = opts;
+    const isArray = arrayLike ? arrayEquals.isArray : Array.isArray;
+    if (isArray(ar1) && isArray(ar2)) {
+        if (equals(ar1, ar2)) return true;
+        if (ar1.length != ar2.length) return false;
+        const opt = {...opts, arrayCheck: true};
+        for (let i = 0; i < ar1.length; i++) {
+            if (objEquals(ar1[i], ar2[i], opt)) continue;
+            return false;
         }
         return true;
     }
-    return Object.is(o1, o2);
+    return null;
 }
+arrayEquals.isArray = (ar) => typeof(ar?.length) == 'number' && ar.length >= 0;
 
 const extendObject = (target, extObj) => (
     target = target === null || target === undefined ? {} : target,
@@ -117,6 +149,7 @@ if (typeof(module) == 'object' && module) module.exports = {
     emptyString,
     isPlainObject,
     objEquals,
+    arrayEquals,
     extendObject,
     proxyObject,
     proxyClass,

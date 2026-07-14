@@ -50,13 +50,72 @@ export var emptyString: string;
 export function isPlainObject(o: any): boolean | null;
 
 /**
- * To compare two plain objects recursively whether they are equal or not. It's not to check the object reference equality.
- * Two plain objects are considered equal if they have exactly the same properties (the same property names and values).
- * If a property value is a plain object then it will also be compared by the same way.
+ * To compare two plain objects (see `isPlainObject` function) recursively whether they are equal or not. It's not to check
+ * the object reference equality. Two plain objects are considered equal if they have exactly the same properties (the same
+ * property names and values). If a property value is a plain object then it will also be compared by the same way. If the
+ * compared property values are array then `arrayEquals` function will be invoked to check the equality.
  * @param o1 First object to compare
  * @param o2 Second object to compare
+ * @param opts This parameter is optional and to determine how both objects are compared. This parameter is an object whose
+ *      the following properties (all ones are optional):
+ *      - `equals` is a function to examine the equality of two values. By default it's `Object.is`. The function signature
+ *        is the same as the signature of `Object.is`. This function is invoked first before it's decided whether or not to
+ *        recurse the comparison process (if two compared properties are also the plain object). If this function returns
+ *        `true`, it will stop the recursive process. If it returns `false` then the recursive process will be done if two
+ *        compared values are the plain object.
+ *      - `allProps` is a boolean to determine whether non enumerable properties are checked or not. By default, it's `true`
+ *        (non enumerable properties also checked). To get all property names including non-enumerable properties, we use
+ *        `Object.getOwnPropertyNames` and if it excludes non-enumerable ones then we use `Object.keys`.
+ *      - `arrayCheck` If it's `true` (default) then if a property is an array, `arrayEquals` function is invoked to compare
+ *        its value. If it's `false` then the function referenced by `equals` is used.
+ *      - `arrayLike` affects how `arrayEquals` function works. Please see the explanation of `arrayEquals` function.
+ * @returns It returns `true` if `o1` and `o2` are equal. Otherwise, it returns `false`.
  */
-export function objEquals(o1: any, o2: any): boolean;
+export function objEquals(
+    o1: any,
+    o2: any,
+    opts?: {
+        equals?: (val1: any, val2: any) => boolean,
+        allProps?: boolean,
+        arrayCheck?: boolean,
+        arrayLike?: boolean,
+    }
+): boolean;
+
+/**
+ * To compare two arrays (or array-like) recursively whether they are equal or not. It's not to check the array reference
+ * equality. Two arrays are considered equal if each item in one array is equal to the item at the same index in another
+ * another array. To examine the equality of two compared items, it will invoke `objEquals` function. If both items are
+ * array, they will also be compared by the same way.
+ * @param ar1 First array to compare
+ * @param ar2 Second array to compare
+ * @param opts This parameter is optional and will be passed to `objEquals` function as third paraameter with `arrayCheck`
+ *      is always `true` (to make recursive comparison). The `opts` property that really matters for this function is
+ *      `arrayLike`. By default, it's `false`. If it's `true` then a value which is array-like will be considered as array.
+ *      The array-like value is a value that can be used in the following statements:
+ *      ```
+ *          for (let i = 0; i < arrayLike.length; i++) {
+ *              console.log(arrayLike[i]);
+ *          }
+ *      ```
+ *      We must be careful to use `arrayLike` option because it can result an unexpected outcome. To check a value is an
+ *      array-like or not, `arrayEquals.isArray` function is used. You may redefine this function to make sure what you
+ *      really want. Currently, this function only does a simple logic:
+ *      ```
+ *          (ar) => typeof(ar?.length) == 'number' && ar.length >= 0
+ *      ```
+ * @returns It returns `true` if array `ar1` and `ar2` are equal and returns `false` if not equal. If both or one of `ar1` or
+ * `ar2` is not an array then it returns `null` 
+ */
+export function arrayEquals(
+    ar1: any,
+    ar2: any,
+    opts?: {
+        equals?: (val1: any, val2: any) => boolean,
+        allProps?: boolean,
+        arrayLike?: boolean,
+    }
+): boolean | null;
 
 type Extend<T, P> = Omit<T, keyof P> & P;
 type CombineObject<T extends object | null | undefined, P extends object | null | undefined> =

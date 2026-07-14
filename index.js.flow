@@ -10,7 +10,25 @@ declare export var emptyObject: {};
 declare export var emptyString: string;
 
 declare export function isPlainObject(o: any): boolean | null;
-declare export function objEquals(o1: any, o2: any): boolean;
+declare export function objEquals(
+    o1: any,
+    o2: any,
+    opts?: {
+        equals?: (val1: any, val2: any) => boolean,
+        allProps?: boolean,
+        arrayCheck?: boolean,
+        arrayLike?: boolean,
+    }
+): boolean;
+declare export function arrayEquals(
+    ar1: any,
+    ar2: any,
+    opts?: {
+        equals?: (val1: any, val2: any) => boolean,
+        allProps?: boolean,
+        arrayLike?: boolean,
+    }
+): boolean | null;
 
 declare export var extendObject:
     (<T: ?{...}, P: ?{...}>(target: T, extObj: P) => {...$Exact<T>, ...$Exact<P>})

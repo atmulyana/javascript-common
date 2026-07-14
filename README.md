@@ -37,7 +37,7 @@ we need a static type checking. The type of the returned value should be the typ
 #### `isPlainObject(obj)`
 To check a variable is a plain object that is an object that is created by using "object literal"
 (`{prop1: val1, prop2: val2, ...}`).  
-Parameters:
+*Parameters*:
 - `obj`  
   Any variable to check
 
@@ -50,20 +50,69 @@ it's better to keep one copy in memory.
 It's a function that does nothing (`() => {}`). This function is often used as the default value for
 a variable whose function type. Instead of maintaining many copies, it's better to keep one copy in memory.
 
-#### `objEquals(obj1, obj2)`
-To compare two plain objects recursively whether they are equal or not. It's not to check the object reference equality.
-Two plain objects are considered equal if they have exactly the same properties (the same property names and values).
-If a property value is a plain object then it will also be compared by the same way.   
-Parameters:
+#### `objEquals(obj1, obj2, opts?)`
+To compare two plain objects (see `isPlainObject` function) recursively whether they are equal or not. It's not to check
+the object reference equality. Two plain objects are considered equal if they have exactly the same properties (the same
+property names and values). If a property value is a plain object then it will also be compared by the same way. If the
+compared property values are array then `arrayEquals` function will be invoked to check the equality.   
+*Parameters*:
 - `obj1`  
   First object to compare
 - `obj2`  
   Second object to compare
+- `opts`  
+  This parameter is optional and to determine how both objects are compared. This parameter is an object whose
+  the following properties (all ones are optional):
+  + `equals` is a function to examine the equality of two values. By default it's `Object.is`. The function signature
+    is the same as the signature of `Object.is`. This function is invoked first before it's decided whether or not to
+    recurse the comparison process (if two compared properties are also the plain object). If this function returns
+    `true`, it will stop the recursive process. If it returns `false` then the recursive process will be done if two
+    compared values are the plain object.
+  + `allProps` is a boolean to determine whether non enumerable properties are checked or not. By default, it's `true`
+    (non enumerable properties also checked). To get all property names including non-enumerable properties, we use
+    `Object.getOwnPropertyNames` and if it excludes non-enumerable ones then we use `Object.keys`.
+  + `arrayCheck` If it's `true` (default) then if a property is an array, `arrayEquals` function is invoked to compare
+    its value. If it's `false` then the function referenced by `equals` is used.
+  + `arrayLike` affects how `arrayEquals` function works. Please see the explanation of `arrayEquals` function.
 
-#### `proxyObject(target, extObj, proxiedIfNotExist)`
+*Returns*:  
+It returns `true` if `o1` and `o2` are equal. Otherwise, it returns `false`.
+
+#### `arrayEquals(ar1, ar2, opts?)`
+To compare two arrays (or array-like) recursively whether they are equal or not. It's not to check the array reference
+equality. Two arrays are considered equal if each item in one array is equal to the item at the same index in another
+another array. To examine the equality of two compared items, it will invoke `objEquals` function. If both items are
+array, they will also be compared by the same way.   
+*Parameters*:
+- `ar1`  
+  First array to compare
+- `ar2`  
+  Second array to compare
+- `opts`  
+  This parameter is optional and will be passed to `objEquals` function as third paraameter with `arrayCheck`
+  is always `true` (to make recursive comparison). The `opts` property that really matters for this function is
+  `arrayLike`. By default, it's `false`. If it's `true` then a value which is array-like will be considered as array.
+  The array-like value is a value that can be used in the following statements:
+  ```
+      for (let i = 0; i < arrayLike.length; i++) {
+          console.log(arrayLike[i]);
+      }
+  ```
+  We must be careful to use `arrayLike` option because it can result an unexpected outcome. To check a value is an
+  array-like or not, `arrayEquals.isArray` function is used. You may redefine this function to make sure what you
+  really want. Currently, this function only does a simple logic:
+  ```
+      (ar) => typeof(ar?.length) == 'number' && ar.length >= 0
+  ```
+
+*Returns*:  
+It returns `true` if array `ar1` and `ar2` are equal and returns `false` if not equal. If both or one of `ar1` or
+`ar2` is not an array then it returns `null`.
+
+#### `proxyObject(target, extObj, proxiedIfNotExist?)`
 Similar to `extendObject` but it doesn't change the prototype of `target`. It utilizes a `Proxy` object. It's
 useful if `target` already has a prototype object.  
-Parameters:
+*Parameters*:
 - `target`  
   The extended object
 - `extObj`   
@@ -72,7 +121,7 @@ Parameters:
   If `true` then a member is read from `extObj` only if the member doesn't exist on `target`.
   By default, it's `false`.
 
-#### `proxyClass(Target, extObj, proxiedIfNotExist)`
+#### `proxyClass(Target, extObj, proxiedIfNotExist?)`
 Similar to `proxyObject` but the first parameter is not an instance object, it's a class of target object.
 This function will create the target instance: `const target = new Target(...args)` and then call `proxyObject`.
 This function returns a `Proxy` object of the class, NOT proxy of the `Target` instance.
