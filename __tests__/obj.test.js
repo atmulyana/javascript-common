@@ -167,6 +167,50 @@ test("`objEquals` function with option `arrayCheck`", () => {
     ).toBe(false);
 });
 
+test("`objEquals` function with option `equals`", () => {
+    let val1 = new Set(['1', '2', '3']),
+        val2 = ['1', '2', '3'],
+        val3 = new Set(['1', '2', '3']);
+        val4 = {0: '1', 1: '2', 2: '3'};
+        val5 = '123';
+    const opts = {
+        equals: (val1, val2) => {
+            if (Array.isArray(val1)) val1 = new Set(val1);
+            if (Array.isArray(val2)) val2 = new Set(val2);
+            if ((val1 instanceof Set) && (val2 instanceof Set)) {
+                return val1.isSupersetOf(val2) && val1.isSubsetOf(val2);
+            }
+            return Object.is(val1, val2);
+        }
+    };
+    
+    expect(
+        objEquals(val1, val2, opts)
+    ).toBe(true);
+     expect(
+        objEquals(val1, val3, opts)
+    ).toBe(true);
+     expect(
+        objEquals(val1, val4, opts)
+    ).toBe(false);
+    expect(
+        objEquals(val1, val5, opts)
+    ).toBe(false);
+
+    expect(
+        objEquals(val1, val2)
+    ).toBe(false);
+     expect(
+        objEquals(val1, val3)
+    ).toBe(false);
+     expect(
+        objEquals(val1, val4)
+    ).toBe(false);
+    expect(
+        objEquals(val1, val5)
+    ).toBe(false);
+});
+
 test("`arrayEquals` function", () => {
     expect(
         arrayEquals([], [])
