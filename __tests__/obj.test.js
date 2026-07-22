@@ -402,4 +402,29 @@ test("`arrayEquals` function with `iterable` option", () => {
     expect(
         arrayEquals(ar4, set4, iterableCheck)
     ).toBe(false);
+
+    const set5 = new Set().add(1).add( new Set([2,3]) )
+        .add( new Set([
+            new Set([4, 5]),
+            new Set([6])
+        ]) );
+    const set6 = new Set().add(1).add([2,3])
+        .add([
+            [4, 5],
+            [6]
+        ]);
+    const set7 = new Set().add(1).add([2,3])
+        .add([
+            [4, 5],
+            [7]
+        ]);
+    expect(
+        arrayEquals(set5, set6, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(set6, set5, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(set5, set7, iterableCheck)
+    ).toBe(false);
 });
