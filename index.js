@@ -47,7 +47,7 @@ function arrayEquals(ar1, ar2, opts = emptyObject) {
     } = opts;
     const opt = {...opts, arrayCheck: true};
     
-    if (iterable && typeof(ar1?.[Symbol.iterator]) == 'function' && typeof(ar1?.[Symbol.iterator]) == 'function') {
+    if (iterable && typeof(ar1?.[Symbol.iterator]) == 'function' && typeof(ar2?.[Symbol.iterator]) == 'function') {
         if (equals(ar1, ar2)) return true;
         const iter1 = ar1[Symbol.iterator](),
               iter2 = ar2[Symbol.iterator]();

@@ -418,6 +418,11 @@ test("`arrayEquals` function with `iterable` option", () => {
             [4, 5],
             [7]
         ]);
+    const set8 = new Set().add(1).add([2,3])
+        .add([
+            [8, 5],
+            [7]
+        ]);
     expect(
         arrayEquals(set5, set6, iterableCheck)
     ).toBe(true);
@@ -427,4 +432,14 @@ test("`arrayEquals` function with `iterable` option", () => {
     expect(
         arrayEquals(set5, set7, iterableCheck)
     ).toBe(false);
+    expect(
+        arrayEquals(set7, set8, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(set7, true, iterableCheck)
+    ).toBeNull();
+    
+    expect(
+        arrayEquals(true, set7, iterableCheck)
+    ).toBeNull();
 });
