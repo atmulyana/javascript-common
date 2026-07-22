@@ -29,7 +29,7 @@ function objEquals(o1, o2, opts = emptyObject) {
             const getKeys = allProps ? Object.getOwnPropertyNames : Object.keys;
             const keys = getKeys(o1);
             if (keys.length != getKeys(o2).length) return false;
-            for (let p in o1) {
+            for (let p of keys) {
                 if ((p in o2) && objEquals(o1[p], o2[p], opts)) continue;
                 return false;
             }
@@ -43,12 +43,39 @@ function arrayEquals(ar1, ar2, opts = emptyObject) {
     const {
         arrayLike,
         equals = Object.is,
+        iterable,
     } = opts;
+    const opt = {...opts, arrayCheck: true};
+    
+    if (iterable && typeof(ar1?.[Symbol.iterator]) == 'function' && typeof(ar1?.[Symbol.iterator]) == 'function') {
+        if (equals(ar1, ar2)) return true;
+        const iter1 = ar1[Symbol.iterator](),
+              iter2 = ar2[Symbol.iterator]();
+        while (true) {
+            const res1 = iter1.next(),
+                  res2 = iter2.next();
+            if (res1.done && res2.done) {
+               return objEquals(res1.value, res2.value, opt);
+            }
+            else if (res1.done) {
+                iter2.return?.();
+            }
+            else if (res2.done) {
+                iter1.return?.();
+            }
+            else { //if (!res1.done && !res2.done)
+                if (objEquals(res1.value, res2.value, opt)) continue;
+                iter1.return?.();
+                iter2.return?.();
+            }
+            return false;
+        }
+    }
+
     const isArray = arrayLike ? arrayEquals.isArray : Array.isArray;
     if (isArray(ar1) && isArray(ar2)) {
         if (equals(ar1, ar2)) return true;
         if (ar1.length != ar2.length) return false;
-        const opt = {...opts, arrayCheck: true};
         for (let i = 0; i < ar1.length; i++) {
             if (objEquals(ar1[i], ar2[i], opt)) continue;
             return false;

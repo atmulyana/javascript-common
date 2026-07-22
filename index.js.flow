@@ -13,21 +13,19 @@ declare export function isPlainObject(o: any): boolean | null;
 declare export function objEquals(
     o1: any,
     o2: any,
-    opts?: {
-        equals?: (val1: any, val2: any) => boolean,
-        allProps?: boolean,
-        arrayCheck?: boolean,
-        arrayLike?: boolean,
-    }
+    opts?: ObjEqualsOpts
 ): boolean;
+type ObjEqualsOpts = {
+    equals?: (val1: any, val2: any) => boolean,
+    allProps?: boolean,
+    arrayCheck?: boolean,
+    arrayLike?: boolean,
+    iterable?: boolean,
+};
 declare export function arrayEquals(
     ar1: any,
     ar2: any,
-    opts?: {
-        equals?: (val1: any, val2: any) => boolean,
-        allProps?: boolean,
-        arrayLike?: boolean,
-    }
+    opts?: Omit<ObjEqualsOpts, 'arrayCheck'>
 ): boolean | null;
 
 declare export var extendObject:

@@ -68,19 +68,22 @@ export function isPlainObject(o: any): boolean | null;
  *        `Object.getOwnPropertyNames` and if it excludes non-enumerable ones then we use `Object.keys`.
  *      - `arrayCheck` If it's `true` (default) then if a property is an array, `arrayEquals` function is invoked to compare
  *        its value. If it's `false` then the function referenced by `equals` is used.
- *      - `arrayLike` affects how `arrayEquals` function works. Please see the explanation of `arrayEquals` function.
+ *      - `arrayLike` and `iterable` affect how `arrayEquals` function works. Please see the explanation of `arrayEquals`
+ *        function.
  * @returns It returns `true` if `o1` and `o2` are equal. Otherwise, it returns `false`.
  */
 export function objEquals(
     o1: any,
     o2: any,
-    opts?: {
-        equals?: (val1: any, val2: any) => boolean,
-        allProps?: boolean,
-        arrayCheck?: boolean,
-        arrayLike?: boolean,
-    }
+    opts?: ObjEqualsOpts
 ): boolean;
+type ObjEqualsOpts = {
+    equals?: (val1: any, val2: any) => boolean,
+    allProps?: boolean,
+    arrayCheck?: boolean,
+    arrayLike?: boolean,
+    iterable?: boolean,
+};
 
 /**
  * To compare two arrays (or array-like) recursively whether they are equal or not. It's not to check the array reference
@@ -90,31 +93,31 @@ export function objEquals(
  * @param ar1 First array to compare
  * @param ar2 Second array to compare
  * @param opts This parameter is optional and will be passed to `objEquals` function as third paraameter with `arrayCheck`
- *      is always `true` (to make recursive comparison). The `opts` property that really matters for this function is
- *      `arrayLike`. By default, it's `false`. If it's `true` then a value which is array-like will be considered as array.
- *      The array-like value is a value that can be used in the following statements:
- *      ```
+ *      is always `true` (to make recursive comparison). The `opts` property that really matters for this function are:
+ *      - `arrayLike`, by default, it's `false`. If it's `true` then a value which is array-like will be considered as array.
+ *        The array-like value is a value that can be used in the following statements:
+ *        ```
  *          for (let i = 0; i < arrayLike.length; i++) {
  *              console.log(arrayLike[i]);
  *          }
- *      ```
- *      We must be careful to use `arrayLike` option because it can result an unexpected outcome. To check a value is an
- *      array-like or not, `arrayEquals.isArray` function is used. You may redefine this function to make sure what you
- *      really want. Currently, this function only does a simple logic:
- *      ```
+ *        ```
+ *        We must be careful to use `arrayLike` option because it can result an unexpected outcome. To check a value is an
+ *        array-like or not, `arrayEquals.isArray` function is used. You may redefine this function to make sure what you
+ *        really want. Currently, this function only does a simple logic:
+ *        ```
  *          (ar) => typeof(ar?.length) == 'number' && ar.length >= 0
- *      ```
+ *        ```
+ *      - `iterable` is how to treat an iterable value. There are some value types which are iterable such as `Map`, `Set`
+ *        and `string`. These values can be considered as an array of items. By default, `iterable` option is `false`. If
+ *        it's `true` then the iterable value will be compared item by item.
+ *        NOTE: `iterable` is evaluated before `arrayLike`.
  * @returns It returns `true` if array `ar1` and `ar2` are equal and returns `false` if not equal. If both or one of `ar1` or
  * `ar2` is not an array then it returns `null` 
  */
 export function arrayEquals(
     ar1: any,
     ar2: any,
-    opts?: {
-        equals?: (val1: any, val2: any) => boolean,
-        allProps?: boolean,
-        arrayLike?: boolean,
-    }
+    opts?: Omit<ObjEqualsOpts, 'arrayCheck'>
 ): boolean | null;
 
 type Extend<T, P> = Omit<T, keyof P> & P;

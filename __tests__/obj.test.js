@@ -127,6 +127,9 @@ test("`objEquals` function with option `allProps`", () => {
         objEquals(obj1, obj3)
     ).toBe(true);
     expect(
+        objEquals(obj3, obj1)
+    ).toBe(true);
+    expect(
         objEquals(obj2, obj3)
     ).toBe(false);
 
@@ -301,4 +304,102 @@ test("`arrayEquals` function with `arrayLike` option", () => {
     expect(
         arrayEquals('', {length: 0}, {arrayLike: true})
     ).toBe(true);
+});
+
+
+
+test("`arrayEquals` function with `iterable` option", () => {
+    const ar1 = ['a', 'b', 'c'], ar2 = ['a', 'b', 'c', 'd', 'e'],
+          str1 = 'abc', str2 = 'abcde',
+          set1 = new Set(ar1), set2 = new Set(ar2),
+          iterableCheck = {iterable: true};
+    
+    expect(
+        arrayEquals(ar1, str1)
+    ).toBeNull();
+    expect(
+        arrayEquals(ar1, set1)
+    ).toBeNull();
+    expect(
+        arrayEquals(set1, str1)
+    ).toBeNull();
+
+    expect(
+        arrayEquals(ar1, str1, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(ar1, set1, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(set1, str1, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(str1, ar1, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(set1, ar1, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(str1, set1, iterableCheck)
+    ).toBe(true);
+
+    expect(
+        arrayEquals(ar1, str2, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(ar1, set2, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(set1, str2, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(ar1, ar2, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(set1, set2, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(str1, str2, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(str2, ar1, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(set2, ar1, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(str2, set1, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(ar2, ar1, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(set2, set1, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(str2, str1, iterableCheck)
+    ).toBe(false);
+
+    const ar3 = []; ar2[1] = 'b';
+    const ar4 = ['', 'b']
+    const set3 = new Set(); set3.add('b');
+    const set4 = new Set(); set3.add(undefined).add('b');
+    expect(
+        arrayEquals(ar3, set3, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(set3, ar3, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(ar3, set4, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(set4, ar3, iterableCheck)
+    ).toBe(true);
+    expect(
+        arrayEquals(set4, ar4, iterableCheck)
+    ).toBe(false);
+    expect(
+        arrayEquals(ar4, set4, iterableCheck)
+    ).toBe(false);
 });

@@ -73,7 +73,8 @@ compared property values are array then `arrayEquals` function will be invoked t
     `Object.getOwnPropertyNames` and if it excludes non-enumerable ones then we use `Object.keys`.
   + `arrayCheck` If it's `true` (default) then if a property is an array, `arrayEquals` function is invoked to compare
     its value. If it's `false` then the function referenced by `equals` is used.
-  + `arrayLike` affects how `arrayEquals` function works. Please see the explanation of `arrayEquals` function.
+  + `arrayLike` and `iterable` affect how `arrayEquals` function works. Please see the explanation of `arrayEquals`
+    function.
 
 *Returns*:  
 It returns `true` if `obj1` and `obj2` are equal. Otherwise, it returns `false`.
@@ -90,20 +91,24 @@ array, they will also be compared by the same way.
   Second array to compare
 - `opts`  
   This parameter is optional and will be passed to `objEquals` function as third paraameter with `arrayCheck`
-  is always `true` (to make recursive comparison). The `opts` property that really matters for this function is
-  `arrayLike`. By default, it's `false`. If it's `true` then a value which is array-like will be considered as array.
-  The array-like value is a value that can be used in the following statements:
-  ```
+  is always `true` (to make recursive comparison). The `opts` property that really matters for this function are:
+  + `arrayLike`, by default, it's `false`. If it's `true` then a value which is array-like will be considered
+    as array. The array-like value is a value that can be used in the following statements:
+    ```
       for (let i = 0; i < arrayLike.length; i++) {
           console.log(arrayLike[i]);
       }
-  ```
-  We must be careful to use `arrayLike` option because it can result an unexpected outcome. To check a value is an
-  array-like or not, `arrayEquals.isArray` function is used. You may redefine this function to make sure what you
-  really want. Currently, this function only does a simple logic:
-  ```
+    ```
+    We must be careful to use `arrayLike` option because it can result an unexpected outcome. To check a value is an
+    array-like or not, `arrayEquals.isArray` function is used. You may redefine this function to make sure what you
+    really want. Currently, this function only does a simple logic:
+    ```
       (ar) => typeof(ar?.length) == 'number' && ar.length >= 0
-  ```
+    ```
+  + `iterable` is how to treat an iterable value. There are some value types which are iterable such as `Map`, `Set`
+    and `string`. These values can be considered as an array of items. By default, `iterable` option is `false`. If
+    it's `true` then the iterable value will be compared item by item.  
+    **NOTE:** `iterable` is evaluated before `arrayLike`.
 
 *Returns*:  
 It returns `true` if array `ar1` and `ar2` are equal and returns `false` if not equal. If both or one of `ar1` or
