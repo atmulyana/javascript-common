@@ -265,6 +265,8 @@ test("`arrayEquals` function", () => {
 });
 
 test("`arrayEquals` function with `arrayLike` option", () => {
+    const arrayLike = {arrayLike: true};
+
     expect(
         arrayEquals(['a','b', 'c'], 'abc')
     ).toBeNull();
@@ -276,13 +278,13 @@ test("`arrayEquals` function with `arrayLike` option", () => {
     ).toBeNull();
 
     expect(
-        arrayEquals(['a','b', 'c'], 'abc', {arrayLike: true})
+        arrayEquals(['a','b', 'c'], 'abc', arrayLike)
     ).toBe(true);
     expect(
-        arrayEquals(['a','b', 'c'], {length: 3, 0: 'a', 1: 'b', 2: 'c'}, {arrayLike: true})
+        arrayEquals(['a','b', 'c'], {length: 3, 0: 'a', 1: 'b', 2: 'c'}, arrayLike)
     ).toBe(true);
     expect(
-        arrayEquals('abc', {length: 3, 0: 'a', 1: 'b', 2: 'c'}, {arrayLike: true})
+        arrayEquals('abc', {length: 3, 0: 'a', 1: 'b', 2: 'c'}, arrayLike)
     ).toBe(true);
 
     expect(
@@ -296,14 +298,24 @@ test("`arrayEquals` function with `arrayLike` option", () => {
     ).toBeNull();
 
     expect(
-        arrayEquals(['a','b', 'c'], 'abc', {arrayLike: true})
+        arrayEquals(['a','b', 'c'], 'abc', arrayLike)
     ).toBe(true);
     expect(
-        arrayEquals([], {length: 0, 0: 'a', 1: 'b', 2: 'c'}, {arrayLike: true})
+        arrayEquals([], {length: 0, 0: 'a', 1: 'b', 2: 'c'}, arrayLike)
     ).toBe(true);
     expect(
-        arrayEquals('', {length: 0}, {arrayLike: true})
+        arrayEquals('', {length: 0}, arrayLike)
     ).toBe(true);
+
+    expect(
+        arrayEquals(['a','b', 'c'], true, arrayLike)
+    ).toBeNull();
+    expect(
+        arrayEquals(true, 'abc', arrayLike)
+    ).toBeNull();
+    expect(
+        arrayEquals(false, false, arrayLike)
+    ).toBeNull();
 });
 
 
@@ -435,11 +447,14 @@ test("`arrayEquals` function with `iterable` option", () => {
     expect(
         arrayEquals(set7, set8, iterableCheck)
     ).toBe(false);
+
     expect(
         arrayEquals(set7, true, iterableCheck)
     ).toBeNull();
-    
     expect(
         arrayEquals(true, set7, iterableCheck)
+    ).toBeNull();
+    expect(
+        arrayEquals(false, false, iterableCheck)
     ).toBeNull();
 });
